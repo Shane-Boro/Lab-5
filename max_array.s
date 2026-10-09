@@ -21,31 +21,26 @@ max_val:
 
 	.text
 	.globl main
-	.def main; .scl 2; .type 32; .endef
-	.seh_proc main
+	.type main, @function
 main:
 	pushq	%rbp
-	.seh_pushreg	%rbp
 	movq	%rsp, %rbp
-	.seh_setframe	%rbp, 0
 	subq	$32, %rsp
-	.seh_stackalloc	32
-	.seh_endprologue
 
-	# Initialize loop counter i = 0
+	# i = 0
 	movl	$0, -4(%rbp)
 
-	# Set max_val = Numbers[0]
+	# max_val = Numbers[0]
 	movl	Numbers(%rip), %eax
 
-	# Load array length into register %edx
+	# Load array length into %edx
 	movl	Array_length(%rip), %edx
 
-	# Jump directly to condition evaluation (while loop)
+	# Jump directly to condition evaluation (while loop pattern)
 	jmp	.L_check_loop
 
 .L_loop_body:
-	# Compute element address: Numbers + (i * 4)
+	# Calculate element address: Numbers + (i * 4)
 	movl	-4(%rbp), %ecx            # Load index 'i' into %ecx
 	leaq	Numbers(%rip), %rbx       # Load base address of Numbers
 	movl	(%rbx,%rcx,4), %r8d       # Load Numbers[i] into %r8d
@@ -67,7 +62,7 @@ main:
 	cmpl	%edx, %ecx
 	jl	.L_loop_body              # If i < 10, run loop body
 
-	# Store final maximum value into max_val memory label
+	# Store final result into memory label max_val
 	movl	%eax, max_val(%rip)
 
 	# Clean return
@@ -75,5 +70,5 @@ main:
 	addq	$32, %rsp
 	popq	%rbp
 	ret
-	.seh_endproc
+	.size	main, .-main
     
